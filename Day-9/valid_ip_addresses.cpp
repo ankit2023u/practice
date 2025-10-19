@@ -1,35 +1,60 @@
 //BRUTE FORCE O(n^4) 
 vector<string> Solution::restoreIpAddresses(string A) {
-    vector<string> answer;
+    // Function to return all possible valid IP addresses from the given string A
+    
+    vector<string> answer; // Stores all valid IP addresses
     int n = A.size();
     
-    if(n > 12) return answer;
+    // Step 1: If string length > 12, it can’t form a valid IP (max 3 digits per 4 parts)
+    if (n > 12) return answer;
     
-    for(int i = 0; i < n; i++){
-        for(int j = i+1; j < n; j++){
-            for(int k = j+1; k < n; k++){
-                for(int l = k+1; l < n; l++){
-                    bool poss = true;
-                    vector<string> val = {A.substr(i, j-i), A.substr(j, k-j), A.substr(k, l-k), A.substr(l, n-l)};
+    // Step 2: Try every possible way to split string into 4 parts (brute-force)
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            for (int k = j + 1; k < n; k++) {
+                for (int l = k + 1; l < n; l++) {
                     
-                    for(int p = 0; p < 4; p++){
-                        int sz = val[p].size();
+                    bool poss = true; // Flag to track if current split is valid
+                    
+                    // Step 3: Split string into 4 parts using current indices
+                    vector<string> val = {
+                        A.substr(i, j - i),
+                        A.substr(j, k - j),
+                        A.substr(k, l - k),
+                        A.substr(l, n - l)
+                    };
+                    
+                    // Step 4: Validate each part according to IP address rules
+                    for (int i = 0; i < 4; i++) {
+                        int sz = val[i].size();
                         
-                        if(sz > 3) poss = false;
-                        else if(sz > 1 && val[p][0] == '0') poss = false;
-                        else if(stoi(val[p]) > 255) poss = false;
+                        // Invalid if:
+                        // - More than 3 digits
+                        // - Has leading zero (e.g., "01", "00")
+                        // - Value exceeds 255
+                        if (sz > 3) poss = false;
+                        else if (sz > 1 && val[i][0] == '0') poss = false;
+                        else if (stoi(val[i]) > 255) poss = false;
                     }
-                    if(!(poss)) continue;
                     
+                    // If not valid, skip this split
+                    if (!poss) continue;
+                    
+                    // Step 5: Construct the IP string with dots between parts
                     string ans = val[0] + "." + val[1] + "." + val[2] + "." + val[3];
-                    if(ans.size() == n+3) answer.push_back(ans);
+                    
+                    // Ensure total size matches (accounts for 3 dots)
+                    if (ans.size() == n + 3)
+                        answer.push_back(ans);
                 }
             }
         }
     }
-    return answer;
     
+    // Step 6: Return all valid IPs found
+    return answer;
 }
+
 
 // BETTER O(n^3) 
 vector<string> Solution::restoreIpAddresses(string A) {
